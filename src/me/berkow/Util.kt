@@ -3,8 +3,7 @@ package me.berkow
 import java.util.*
 
 val F1_FUNCTION = { args: DoubleArray ->
-//    args.map { arg -> arg * arg }.sum()
-    args.fold(.0, { prev, arg -> prev + arg * arg })
+    args.map { arg -> arg * arg }.sum()
 }
 
 val F2_FUNCTION = { args: DoubleArray ->
@@ -57,18 +56,6 @@ fun getRandomValues(valuesCount: Int, min: Int = 0, max: Int, restricted: Set<In
     }
 
     return result
-}
-
-infix fun DoubleArray.plus(other: DoubleArray): DoubleArray {
-    return DoubleArray(this.size) { ind -> this[ind] + other[ind] }
-}
-
-infix fun DoubleArray.minus(other: DoubleArray): DoubleArray {
-    return DoubleArray(this.size) { ind -> this[ind] - other[ind] }
-}
-
-infix fun DoubleArray.multiply(multiplier: Double): DoubleArray {
-    return DoubleArray(this.size) { ind -> this[ind] * multiplier }
 }
 
 fun Collection<Double>.product(): Double = fold(1.0, { accumulated, element -> accumulated * element })
