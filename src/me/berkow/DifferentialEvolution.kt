@@ -122,7 +122,7 @@ fun differentialEvolution(parameters: Map<String, Any>, initialPopulation: Array
 
     println("average cost = ${previousAverageCost}")
 
-    return function.evalutionsCount
+    return function.evaluationsCount
 }
 
 fun de(parameters: Map<String, Any>, previousVectors: Array<List<Double>>,

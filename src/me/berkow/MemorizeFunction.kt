@@ -7,12 +7,12 @@ import java.util.*
  */
 class MemorizeFunction<T, V>(val function: (T) -> V) : (T) -> V {
 
-    val evalutedResults = HashMap<T, V>()
-    var evalutionsCount = 0
+    val evaluatedResults = HashMap<T, V>()
+    var evaluationsCount = 0
         private set
 
-    override fun invoke(element: T): V = evalutedResults.getOrPut(element) {
-        evalutionsCount++
+    override fun invoke(element: T): V = evaluatedResults.getOrPut(element) {
+        evaluationsCount++
         function.invoke(element)
     }
 }
