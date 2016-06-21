@@ -15,9 +15,7 @@ fun makeTest(problem: FunctionProblem, precision: Double = DEFAULT_PRECISION, ma
     val probableSolution = problem.solution
 
     val lowerBounds = problem.lowerBounds
-    println("lowerBounds = ${Arrays.toString(lowerBounds)}")
     val upperBounds = problem.upperBounds
-    println("upperBounds = ${Arrays.toString(upperBounds)}")
 
     val deParameters1 = deParameters.plus(LOWER_CONSTRAINTS to lowerBounds).plus(UPPER_CONSTRAINTS to upperBounds)
 
@@ -78,6 +76,51 @@ fun main(args: Array<String>) {
             CROSSOVER_PROBABILITY to crossoverProbability
     )
 
+    println("Problem 1")
     makeTest(FunctionProblem.HOLDER.F1_PROBLEM, maxGenerations = maxGenerations, seed = seed,
+            deParameters = deParameters, sadeParameters = sadeParameters, tdeParameters = tdeParameters)
+
+    println("Problem 2")
+    makeTest(FunctionProblem.HOLDER.F2_PROBLEM, maxGenerations = maxGenerations, seed = seed,
+            deParameters = deParameters, sadeParameters = sadeParameters, tdeParameters = tdeParameters)
+
+    println("Problem 3")
+    makeTest(FunctionProblem.HOLDER.F3_PROBLEM, maxGenerations = maxGenerations, seed = seed,
+            deParameters = deParameters, sadeParameters = sadeParameters, tdeParameters = tdeParameters)
+
+    println("Problem 4")
+    makeTest(FunctionProblem.HOLDER.F4_PROBLEM, maxGenerations = maxGenerations, seed = seed,
+            deParameters = deParameters, sadeParameters = sadeParameters, tdeParameters = tdeParameters)
+
+    println("Problem 5")
+    makeTest(FunctionProblem.HOLDER.F5_PROBLEM, maxGenerations = maxGenerations, seed = seed,
+            deParameters = deParameters, sadeParameters = sadeParameters, tdeParameters = tdeParameters)
+
+    println("Problem 6")
+    makeTest(FunctionProblem.HOLDER.F6_PROBLEM, maxGenerations = maxGenerations, seed = seed,
+            deParameters = deParameters, sadeParameters = sadeParameters, tdeParameters = tdeParameters)
+
+    println("Problem 7")
+    makeTest(FunctionProblem.HOLDER.F7_PROBLEM, maxGenerations = maxGenerations, seed = seed,
+            deParameters = deParameters, sadeParameters = sadeParameters, tdeParameters = tdeParameters)
+
+    println("Problem 8")
+    makeTest(FunctionProblem.HOLDER.F8_PROBLEM, maxGenerations = maxGenerations, seed = seed,
+            deParameters = deParameters, sadeParameters = sadeParameters, tdeParameters = tdeParameters)
+
+    println("Problem 9")
+    makeTest(FunctionProblem.HOLDER.F9_PROBLEM, maxGenerations = maxGenerations, seed = seed,
+            deParameters = deParameters, sadeParameters = sadeParameters, tdeParameters = tdeParameters)
+
+    println("Problem 10")
+    makeTest(FunctionProblem.HOLDER.F10_PROBLEM, maxGenerations = maxGenerations, seed = seed,
+            deParameters = deParameters, sadeParameters = sadeParameters, tdeParameters = tdeParameters)
+
+    println("Problem 11")
+    makeTest(FunctionProblem.HOLDER.F11_PROBLEM, maxGenerations = maxGenerations, seed = seed,
+            deParameters = deParameters, sadeParameters = sadeParameters, tdeParameters = tdeParameters)
+
+    println("Problem 12")
+    makeTest(FunctionProblem.HOLDER.F12_PROBLEM, maxGenerations = maxGenerations, seed = seed,
             deParameters = deParameters, sadeParameters = sadeParameters, tdeParameters = tdeParameters)
 }

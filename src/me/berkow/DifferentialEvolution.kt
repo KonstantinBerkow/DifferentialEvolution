@@ -14,16 +14,14 @@ val T1 = "t1"
 val T2 = "t2"
 
 fun main(args: Array<String>) {
-    
-}
 
+}
 
 fun differentialEvolution(parameters: Map<String, Any>, initialPopulation: Array<List<Double>>,
                           newGenerationBlock: (Map<String, Any>, Array<List<Double>>, Random, MemoizeFunction<List<Double>, Double>) -> Array<List<Double>>,
                           maxGenerationsCount: Int, precision: Double, function: MemoizeFunction<List<Double>, Double>,
                           random: Random, stagnationThreshold: Int = initialPopulation.size,
                           probablySolution: List<Double>?): Int {
-    println("parameters = [${parameters}], initialPopulation = [${initialPopulation}], newGenerationBlock = [${newGenerationBlock}], maxGenerationsCount = [${maxGenerationsCount}], precision = [${precision}], function = [${function}], random = [${random}], stagnationThreshold = [${stagnationThreshold}], probablySolution = [${probablySolution}]")
     var previousVectors = initialPopulation
 
     var previousAverageCost = previousVectors.map { function(it) }.average()
