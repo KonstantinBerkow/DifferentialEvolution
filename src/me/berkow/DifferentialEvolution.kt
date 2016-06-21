@@ -14,7 +14,7 @@ val T1 = "t1"
 val T2 = "t2"
 
 fun main(args: Array<String>) {
-    
+
 }
 
 fun differentialEvolution(parameters: Map<String, Any>, initialPopulation: Array<List<Double>>,
@@ -33,9 +33,9 @@ fun differentialEvolution(parameters: Map<String, Any>, initialPopulation: Array
     loop@ for (generation in 1..maxGenerationsCount) {
         val newVectors = newGenerationBlock(parameters, previousVectors, random, function)
 
-        val builder = StringBuilder()
-        newVectors.forEach { builder.append(it).append(' ') }
-        println("builder = ${builder}")
+//        val builder = StringBuilder()
+//        newVectors.forEach { builder.append(it).append(' ') }
+//        println("builder = ${builder}")
 
         val currentAverageCost = newVectors.map { function(it) }.average()
 //        println("currentAverageCost = ${currentAverageCost}")

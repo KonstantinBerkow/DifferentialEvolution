@@ -11,7 +11,7 @@ class FunctionProblem(val function: (List<Double>) -> Double, val lBound: Double
     val upperBounds = DoubleArray(problemSize, { uBound })
 
     object HOLDER {
-        val PROBLEM_SIZE = 2
+        val PROBLEM_SIZE = 10
 
         @JvmStatic
         val F1_PROBLEM = FunctionProblem(F1_FUNCTION, -100.0, 100.0, DoubleArray(PROBLEM_SIZE, { .0 }).asList())
