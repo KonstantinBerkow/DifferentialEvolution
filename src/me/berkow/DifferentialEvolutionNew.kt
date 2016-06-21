@@ -36,14 +36,6 @@ fun main(args: Array<String>) {
     val function = F2_FUNCTION
     val precision = 1e-6
 
-//    solveDE(maxGenerations, populationSize, random1, problemSize, crossoverProbability,
-//            amplification, lowerConstraints, upperConstraints, "DE.csv", function)
-//
-//    val lowerAmplificationFactor = 0.4
-//    solveWDE(maxGenerations, populationSize, random2, problemSize, crossoverProbability,
-//            lowerAmplificationFactor, lowerConstraints, upperConstraints, "WDE.csv", function)
-//
-
     val initialSolution = Array(populationSize, { createRandomVector(lowerConstraints, upperConstraints, Random()) })
 
     val deParameters = mapOf(
