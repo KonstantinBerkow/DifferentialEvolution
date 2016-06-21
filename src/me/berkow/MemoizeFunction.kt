@@ -5,7 +5,7 @@ import java.util.*
 /**
  * Created by konstantinberkov on 6/20/16.
  */
-class MemorizeFunction<T, V>(val function: (T) -> V) : (T) -> V {
+class MemoizeFunction<T, V>(val function: (T) -> V) : (T) -> V {
 
     val evaluatedResults = HashMap<T, V>()
     var evaluationsCount = 0
@@ -17,4 +17,4 @@ class MemorizeFunction<T, V>(val function: (T) -> V) : (T) -> V {
     }
 }
 
-fun <T, V> memorize(function: (T) -> V): MemorizeFunction<T, V> = MemorizeFunction(function)
+fun <T, V> memoize(function: (T) -> V): MemoizeFunction<T, V> = MemoizeFunction(function)

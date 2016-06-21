@@ -28,13 +28,3 @@ fun createRandomVector(lowerConstraints: DoubleArray, upperConstraints: DoubleAr
         random.nextDouble(min, max)
     }).asList()
 }
-
-fun solveJRC(problemSize: Int): Triple<Int, Int, Int> {
-    var j = 0
-    var R  = 1
-    while (R - 1 < problemSize) {
-        j++
-        R *= 2
-    }
-    return Triple(j, R, R -1)
-}

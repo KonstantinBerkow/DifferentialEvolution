@@ -40,7 +40,7 @@ fun main(args: Array<String>) {
             CROSSOVER_PROBABILITY to crossoverProbability
     )
     val evaluationsForDE = differentialEvolution(deParameters, initialSolution, ::de, maxGenerations, precision,
-            memorize(function), random1, probablySolution = probableSolution)
+            memoize(function), random1, probablySolution = probableSolution)
 
     val lowerF = 0.1
     val upperF = 0.9
@@ -57,7 +57,7 @@ fun main(args: Array<String>) {
             UPPER_AMPLIFICATION to upperF
     )
     val evaluationsForSDE = differentialEvolution(sadeParameters, initialSolution, ::sade, maxGenerations, precision,
-            memorize(function), random3, probablySolution = probableSolution)
+            memoize(function), random3, probablySolution = probableSolution)
 
     val tdeParameters = mapOf(
             LOWER_CONSTRAINTS to lowerConstraints,
@@ -66,7 +66,7 @@ fun main(args: Array<String>) {
             CROSSOVER_PROBABILITY to crossoverProbability
     )
     val evaluationsForTDE = differentialEvolution(tdeParameters, initialSolution, ::tde, maxGenerations, precision,
-            memorize(function), random2, probablySolution = probableSolution)
+            memoize(function), random2, probablySolution = probableSolution)
 
 
     println("evaluationsForDE = $evaluationsForDE, evaluationsForSDE = $evaluationsForSDE, evaluationsForTDE = $evaluationsForTDE")
@@ -74,8 +74,8 @@ fun main(args: Array<String>) {
 
 
 fun differentialEvolution(parameters: Map<String, Any>, initialPopulation: Array<List<Double>>,
-                          newGenerationBlock: (Map<String, Any>, Array<List<Double>>, Random, MemorizeFunction<List<Double>, Double>) -> Array<List<Double>>,
-                          maxGenerationsCount: Int, precision: Double, function: MemorizeFunction<List<Double>, Double>,
+                          newGenerationBlock: (Map<String, Any>, Array<List<Double>>, Random, MemoizeFunction<List<Double>, Double>) -> Array<List<Double>>,
+                          maxGenerationsCount: Int, precision: Double, function: MemoizeFunction<List<Double>, Double>,
                           random: Random, stagnationThreshold: Int = initialPopulation.size,
                           probablySolution: List<Double>?): Int {
     var previousVectors = initialPopulation
@@ -126,7 +126,7 @@ fun differentialEvolution(parameters: Map<String, Any>, initialPopulation: Array
 }
 
 fun de(parameters: Map<String, Any>, previousVectors: Array<List<Double>>,
-       random: Random, function: MemorizeFunction<List<Double>, Double>): Array<List<Double>> {
+       random: Random, function: MemoizeFunction<List<Double>, Double>): Array<List<Double>> {
     val populationSize = previousVectors.size
     val problemSize = previousVectors[0].size
 
@@ -155,7 +155,7 @@ fun de(parameters: Map<String, Any>, previousVectors: Array<List<Double>>,
 }
 
 fun sade(parameters: Map<String, Any>, previousVectors: Array<List<Double>>,
-         random: Random, function: MemorizeFunction<List<Double>, Double>): Array<List<Double>> {
+         random: Random, function: MemoizeFunction<List<Double>, Double>): Array<List<Double>> {
     val populationSize = previousVectors.size
     val problemSize = previousVectors[0].size
     val lowerConstraints = parameters[LOWER_CONSTRAINTS] as DoubleArray
@@ -193,7 +193,7 @@ fun sade(parameters: Map<String, Any>, previousVectors: Array<List<Double>>,
 }
 
 fun tde(parameters: Map<String, Any>, previousVectors: Array<List<Double>>,
-        random: Random, function: MemorizeFunction<List<Double>, Double>): Array<List<Double>> {
+        random: Random, function: MemoizeFunction<List<Double>, Double>): Array<List<Double>> {
     val populationSize = previousVectors.size
     val problemSize = previousVectors[0].size
 
