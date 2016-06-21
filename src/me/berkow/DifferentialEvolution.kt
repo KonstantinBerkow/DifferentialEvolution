@@ -25,18 +25,20 @@ fun main(args: Array<String>) {
     val random2 = Random(233313L)
     val random3 = Random(233313L)
 
-    val problemSize = 30
+    val problemSize = 10
     val lowerConstraints = DoubleArray(problemSize, { -100.0 })
     val upperConstraints = DoubleArray(problemSize, { 100.0 })
-    val maxGenerations = 1500
+    val maxGenerations = 1000
 
     val populationSize = problemSize * 6
-    val amplification = 0.9
-    val crossoverProbability = 0.5
-    val function = F2_FUNCTION
+    val function = F1_FUNCTION
     val precision = 1e-6
 
+    val probableSolution = DoubleArray(problemSize, { 0.0 }).asList()
     val initialSolution = Array(populationSize, { createRandomVector(lowerConstraints, upperConstraints, Random()) })
+    val memorizedFunction = memorize(F1_FUNCTION)
+    val amplification = 0.9
+    val crossoverProbability = 0.5
 
     val deParameters = mapOf(
             LOWER_CONSTRAINTS to lowerConstraints,
@@ -44,23 +46,24 @@ fun main(args: Array<String>) {
             AMPLIFICATION to amplification,
             CROSSOVER_PROBABILITY to crossoverProbability
     )
+    differentialEvolution(deParameters, initialSolution, ::de, maxGenerations, precision, memorizedFunction, random1,
+            probablySolution = probableSolution)
+    val evaluationsForDE = memorizedFunction.evalutionsCount
 
-    differentialEvolution(deParameters, initialSolution, ::de, maxGenerations, precision, memorize(function), random1)
-
-    val wdeParameters = mapOf(
+    val tdeParameters = mapOf(
             LOWER_CONSTRAINTS to lowerConstraints,
             UPPER_CONSTRAINTS to upperConstraints,
             AMPLIFICATION to amplification,
             CROSSOVER_PROBABILITY to crossoverProbability
     )
-
-    differentialEvolution(wdeParameters, initialSolution, ::wde, maxGenerations, precision, memorize(function), random2)
+    differentialEvolution(tdeParameters, initialSolution, ::tde, maxGenerations, precision, memorize(function), random2,
+            probablySolution = probableSolution)
+    val evaluationsForTDE = memorizedFunction.evalutionsCount - evaluationsForDE + populationSize
 
     val lowerF = 0.1
     val upperF = 0.9
     val t1 = 0.1
     val t2 = 0.1
-
     val sadeParameters = mapOf(
             LOWER_CONSTRAINTS to lowerConstraints,
             UPPER_CONSTRAINTS to upperConstraints,
@@ -71,47 +74,56 @@ fun main(args: Array<String>) {
             LOWER_AMPLIFICATION to lowerF,
             UPPER_AMPLIFICATION to upperF
     )
-    differentialEvolution(sadeParameters, initialSolution, ::sade, maxGenerations, precision, memorize(function), random3)
+    differentialEvolution(sadeParameters, initialSolution, ::sade, maxGenerations, precision, memorize(function), random3,
+            probablySolution = probableSolution)
+    val evaluationsForSDE = memorizedFunction.evalutionsCount - evaluationsForDE - evaluationsForTDE + populationSize + populationSize
+
+
+    println("evaluationsForDE = $evaluationsForDE, evaluationsForTDE = $evaluationsForTDE, evaluationsForSDE = $evaluationsForSDE")
 }
 
 
 fun differentialEvolution(parameters: Map<String, Any>, initialPopulation: Array<List<Double>>,
-                          newGenerationBlock: (Map<String, Any>, Array<List<Double>>, Random, (List<Double>) -> Double) -> Array<List<Double>>,
-                          maxGenerationsCount: Int, precision: Double, function: MemorizeFunction<Double, Double>,
-                          random: Random, stagnationThreshold: Int = initialPopulation.size) {
+                          newGenerationBlock: (Map<String, Any>, Array<List<Double>>, Random, MemorizeFunction<List<Double>, Double>) -> Array<List<Double>>,
+                          maxGenerationsCount: Int, precision: Double, function: MemorizeFunction<List<Double>, Double>,
+                          random: Random, stagnationThreshold: Int = initialPopulation.size, probablySolution: List<Double>) {
     var previousVectors = initialPopulation
 
-    var previousBest = previousVectors.map { function.invoke(it) }.average()
+    var previousAverageCost = previousVectors.map { function(it) }.average()
     var stagnationCount = 0
-    println("initial average = ${previousBest}")
+    println("initial average = ${previousAverageCost}")
 
     loop@ for (generation in 1..maxGenerationsCount) {
-        val newVectors = newGenerationBlock.invoke(parameters, previousVectors, random, function)
+        val newVectors = newGenerationBlock(parameters, previousVectors, random, function)
 
-        val newBest = newVectors.map { function.invoke(it) }.average()
-//        println("newBest = ${newBest}")
+        val averageCost = newVectors.map { function(it) }.average()
+//        println("averageCost = ${averageCost}")
 
-        if (Math.abs(newBest - previousBest) < precision) {
+        if (Math.abs(averageCost - previousAverageCost) < precision) {
             stagnationCount++
         } else {
             stagnationCount = 0
         }
 
-        previousBest = newBest
+        previousAverageCost = averageCost
         previousVectors = newVectors
 
         if (stagnationCount >= stagnationThreshold) {
-            println("generation = ${generation}")
+            println("stop generation = ${generation}")
+            break@loop
+        }
+
+        if (Math.abs(function(probablySolution) - averageCost) < precision) {
+            println("stop generation = ${generation}")
             break@loop
         }
     }
 
-    println("average cost = ${previousBest}")
-    println("evalutions = ${function.evalutionsCount}")
+    println("average cost = ${previousAverageCost}")
 }
 
 fun de(parameters: Map<String, Any>, previousVectors: Array<List<Double>>,
-       random: Random, function: (List<Double>) -> Double): Array<List<Double>> {
+       random: Random, function: MemorizeFunction<List<Double>, Double>): Array<List<Double>> {
     val populationSize = previousVectors.size
     val problemSize = previousVectors[0].size
 
@@ -122,14 +134,11 @@ fun de(parameters: Map<String, Any>, previousVectors: Array<List<Double>>,
 
     return Array(populationSize, { index ->
         val vector = previousVectors[index]
-        val targetedIndexes = getRandomValues(3, 0, populationSize, setOf(index), random).toIntArray()
-        val a = targetedIndexes[2]
-        val b = targetedIndexes[0]
-        val c = targetedIndexes[1]
+        val r = getRandomValues(3, 0, populationSize, setOf(index), random).toIntArray()
         val mandatoryIndex = random.nextInt(problemSize)
         val newVector = DoubleArray(problemSize, { j ->
             val newValue = if (mandatoryIndex == j || random.nextDouble() < crossoverProbability) {
-                previousVectors[a][j] + amplification * (previousVectors[b][j] - previousVectors[c][j])
+                previousVectors[r[0]][j] + amplification * (previousVectors[r[1]][j] - previousVectors[r[2]][j])
             } else {
                 vector[j]
             }
@@ -138,12 +147,12 @@ fun de(parameters: Map<String, Any>, previousVectors: Array<List<Double>>,
             if (newValue < min || max < newValue) random.nextDouble(min, max) else newValue
         }).asList()
 
-        if (function.invoke(newVector) < function.invoke(vector)) newVector else vector
+        if (function(newVector) < function(vector)) newVector else vector
     })
 }
 
 fun sade(parameters: Map<String, Any>, previousVectors: Array<List<Double>>,
-         random: Random, function: (List<Double>) -> Double): Array<List<Double>> {
+         random: Random, function: MemorizeFunction<List<Double>, Double>): Array<List<Double>> {
     val populationSize = previousVectors.size
     val problemSize = previousVectors[0].size
     val lowerConstraints = parameters[LOWER_CONSTRAINTS] as DoubleArray
@@ -163,14 +172,11 @@ fun sade(parameters: Map<String, Any>, previousVectors: Array<List<Double>>,
 
     return Array(populationSize, { index ->
         val vector = previousVectors[index]
-        val targetedIndexes = getRandomValues(3, 0, populationSize, setOf(index), random).toIntArray()
-        val a = targetedIndexes[2]
-        val b = targetedIndexes[0]
-        val c = targetedIndexes[1]
+        val r = getRandomValues(3, 0, populationSize, setOf(index), random).toIntArray()
         val mandatoryIndex = random.nextInt(problemSize)
         val newVector = DoubleArray(problemSize, { j ->
             val newValue = if (mandatoryIndex == j || random.nextDouble() < CR) {
-                previousVectors[a][j] + F * (previousVectors[b][j] - previousVectors[c][j])
+                previousVectors[r[0]][j] + F * (previousVectors[r[1]][j] - previousVectors[r[2]][j])
             } else {
                 vector[j]
             }
@@ -179,45 +185,46 @@ fun sade(parameters: Map<String, Any>, previousVectors: Array<List<Double>>,
             if (newValue < min || max < newValue) random.nextDouble(min, max) else newValue
         }).asList()
 
-        if (function.invoke(newVector) < function.invoke(vector)) newVector else vector
+        if (function(newVector) < function(vector)) newVector else vector
     })
 }
 
-fun wde(parameters: Map<String, Any>, previousVectors: Array<List<Double>>,
-        random: Random, function: (List<Double>) -> Double): Array<List<Double>> {
+fun tde(parameters: Map<String, Any>, previousVectors: Array<List<Double>>,
+        random: Random, function: MemorizeFunction<List<Double>, Double>): Array<List<Double>> {
     val populationSize = previousVectors.size
     val problemSize = previousVectors[0].size
 
     val lowerConstraints = parameters[LOWER_CONSTRAINTS] as DoubleArray
     val upperConstraints = parameters[UPPER_CONSTRAINTS] as DoubleArray
-    val defaultAmplification = parameters[AMPLIFICATION] as Double
+    val amplification = parameters[AMPLIFICATION] as Double
     val crossoverProbability = parameters[CROSSOVER_PROBABILITY] as Double
-
-    val costs = previousVectors.map { function.invoke(it) }
-    val maxF = costs.max()!!
-    val minF = costs.min()!!
-    val otn = Math.abs(maxF / minF)
-    val amplification = Math.max(defaultAmplification, if (otn < 1) 1 - otn else 1 - 1 / otn)
 
     return Array(populationSize, { index ->
         val vector = previousVectors[index]
-        val targetedIndexes = getRandomValues(3, 0, populationSize, setOf(index), random).toIntArray()
-        val a = targetedIndexes[2]
-        val b = targetedIndexes[0]
-        val c = targetedIndexes[1]
+        val r = getRandomValues(3, 0, populationSize, setOf(index), random).toIntArray()
+
+        val p = r.map { previousVectors[it] }.map { function(it) }.map { Math.abs(it) }.sum()
+        val p1 = Math.abs(function(previousVectors[r[0]])) / p
+        val p2 = Math.abs(function(previousVectors[r[1]])) / p
+        val p3 = Math.abs(function(previousVectors[r[2]])) / p
+
         val mandatoryIndex = random.nextInt(problemSize)
         val newVector = DoubleArray(problemSize, { j ->
             val newValue = if (mandatoryIndex == j || random.nextDouble() < crossoverProbability) {
-                previousVectors[a][j] + amplification * (previousVectors[b][j] - previousVectors[c][j])
+                val x1 = previousVectors[r[0]][j]
+                val x2 = previousVectors[r[1]][j]
+                val x3 = previousVectors[r[2]][j]
+
+                (x1 + x2 + x3) / 3.0 + (p2 - p1) * (x1 - x2) + (p3 - p2) * (x2 - x3) + (p1 - p3) * (x3 - x1)
             } else {
-                vector[j]
+                previousVectors[r[0]][j] + amplification * (previousVectors[r[1]][j] - previousVectors[r[2]][j])
             }
             val min = lowerConstraints[j]
             val max = upperConstraints[j]
+
             if (newValue < min || max < newValue) random.nextDouble(min, max) else newValue
         }).asList()
 
-        if (function.invoke(newVector) < function.invoke(vector)) newVector else vector
+        if (function(newVector) < function(vector)) newVector else vector
     })
 }
-
