@@ -14,62 +14,7 @@ val T1 = "t1"
 val T2 = "t2"
 
 fun main(args: Array<String>) {
-    val seed  = System.nanoTime()
-    val random1 = Random(seed)
-    val random2 = Random(seed)
-    val random3 = Random(seed)
-
-    val problemSize = 10
-    val lowerConstraints = DoubleArray(problemSize, { -100.0 })
-    val upperConstraints = DoubleArray(problemSize, { 100.0 })
-    val maxGenerations = 1000
-
-    val populationSize = problemSize * 6
-    val function = F1_FUNCTION
-    val precision = 1e-12
-
-    val probableSolution = DoubleArray(problemSize, { 0.0 }).asList()
-    val initialSolution = Array(populationSize, { createRandomVector(lowerConstraints, upperConstraints, Random()) })
-    val amplification = 0.9
-    val crossoverProbability = 0.5
-
-    val deParameters = mapOf(
-            LOWER_CONSTRAINTS to lowerConstraints,
-            UPPER_CONSTRAINTS to upperConstraints,
-            AMPLIFICATION to amplification,
-            CROSSOVER_PROBABILITY to crossoverProbability
-    )
-    val evaluationsForDE = differentialEvolution(deParameters, initialSolution, ::de, maxGenerations, precision,
-            memoize(function), random1, probablySolution = probableSolution)
-
-    val lowerF = 0.1
-    val upperF = 0.9
-    val t1 = 0.1
-    val t2 = 0.1
-    val sadeParameters = mapOf(
-            LOWER_CONSTRAINTS to lowerConstraints,
-            UPPER_CONSTRAINTS to upperConstraints,
-            AMPLIFICATIONS to LinkedList<Double>(listOf(upperF)),
-            CROSSOVER_PROBABILITIES to LinkedList<Double>(listOf(0.5)),
-            T1 to t1,
-            T2 to t2,
-            LOWER_AMPLIFICATION to lowerF,
-            UPPER_AMPLIFICATION to upperF
-    )
-    val evaluationsForSDE = differentialEvolution(sadeParameters, initialSolution, ::sade, maxGenerations, precision,
-            memoize(function), random3, probablySolution = probableSolution)
-
-    val tdeParameters = mapOf(
-            LOWER_CONSTRAINTS to lowerConstraints,
-            UPPER_CONSTRAINTS to upperConstraints,
-            AMPLIFICATION to amplification,
-            CROSSOVER_PROBABILITY to crossoverProbability
-    )
-    val evaluationsForTDE = differentialEvolution(tdeParameters, initialSolution, ::tde, maxGenerations, precision,
-            memoize(function), random2, probablySolution = probableSolution)
-
-
-    println("evaluationsForDE = $evaluationsForDE, evaluationsForSDE = $evaluationsForSDE, evaluationsForTDE = $evaluationsForTDE")
+    
 }
 
 
