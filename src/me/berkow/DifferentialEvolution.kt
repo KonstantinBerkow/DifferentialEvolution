@@ -60,11 +60,9 @@ fun differentialEvolution(parameters: Map<String, Any>, initialPopulation: Array
 
     when (stopTrigger) {
         0 -> println("Stopped due reaching max generations count!")
-        1 -> println("Stopped due stagnation at $stopGeneration!")
-        2 -> println("Stopped due to approximating probable solution at $stopGeneration!")
+        1 -> println("Stopped due stagnation!")
+        2 -> println("Stopped due to approximating probable solution!")
     }
-
-    println("average cost = ${previousAverageCost}")
 
     return Triple(previousAverageCost, function.evaluationsCount, stopGeneration)
 }
