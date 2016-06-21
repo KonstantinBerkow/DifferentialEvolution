@@ -44,10 +44,6 @@ class FunctionProblem(val function: (List<Double>) -> Double, val lBound: Double
         val F10_PROBLEM = FunctionProblem(F10_FUNCTION, -600.0, 600.0, DoubleArray(PROBLEM_SIZE, { .0 }).asList())
 
         @JvmStatic
-        val F11_PROBLEM = FunctionProblem(F11_FUNCTION, -50.0, 50.0, DoubleArray(PROBLEM_SIZE, { 1.0 }).asList())
-
-        @JvmStatic
-        val F12_PROBLEM = FunctionProblem(F12_FUNCTION, -0.5, 0.5, DoubleArray(PROBLEM_SIZE, { .0 }).asList())
-
+        val F12_PROBLEM = FunctionProblem(F11_FUNCTION, -0.5, 0.5, DoubleArray(PROBLEM_SIZE, { .0 }).asList())
     }
 }

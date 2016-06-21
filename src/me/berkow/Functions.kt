@@ -57,31 +57,10 @@ val F10_FUNCTION = { args: List<Double> ->
 }
 
 val F11_FUNCTION = { args: List<Double> ->
-    val tmp1 = Math.sin(Math.PI * args[0])
-    val tmp2 = F11A(args)
-    val tmp3 = args.last() - 1
-    val overall = 10 * tmp1 * tmp1 + tmp2 + tmp3 * tmp3
-
-    Math.PI * overall / args.size - args.map { PENALTY(it, 10.0, 100.0, 4.0) }.sum()
+    getF11(args, 0.5, 3.0, 25)
 }
 
-fun F11A(args: List<Double>) = args.dropLast(1).mapIndexed { i, x ->
-    val tmp1 = x - 1
-    val tmp2 = Math.sin(Math.PI * args[i + 1])
-    tmp1 * tmp1 * (1 + 10 * tmp2 * tmp2)
-}.sum()
-
-fun PENALTY(x: Double, a: Double, k: Double, m: Double) = when {
-    x >= a -> k * Math.pow(x - a, m)
-    x <= -a -> k * Math.pow(-x - a, m)
-    else -> 0.0
-}
-
-val F12_FUNCTION = { args: List<Double> ->
-    getF12(args, 0.5, 3.0, 25)
-}
-
-fun getF12(args: List<Double>, a: Double, b: Double, kMax: Int): Double {
+fun getF11(args: List<Double>, a: Double, b: Double, kMax: Int): Double {
     val tmp1 = args.map { x -> (0..kMax).map { k -> Math.pow(a, k.toDouble()) * Math.cos(_2PI * (x + 0.5)) }.sum() }.sum()
     val tmp2 = (0..kMax).map { k -> Math.pow(a, k.toDouble()) * Math.cos(Math.PI * Math.pow(b, k.toDouble())) }.sum()
 

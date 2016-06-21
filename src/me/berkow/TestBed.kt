@@ -140,12 +140,6 @@ fun main(args: Array<String>) {
     builder.append("\n")
 
     builder.append("F11,")
-    makeTest(FunctionProblem.HOLDER.F11_PROBLEM, maxGenerations = maxGenerations, seed = seed,
-            deParameters = deParameters, sadeParameters = sadeParameters, tdeParameters = tdeParameters)
-            .forEach { builder.append(it).append(',') }
-    builder.append("\n")
-
-    builder.append("F12,")
     makeTest(FunctionProblem.HOLDER.F12_PROBLEM, maxGenerations = maxGenerations, seed = seed,
             deParameters = deParameters, sadeParameters = sadeParameters, tdeParameters = tdeParameters)
             .forEach { builder.append(it).append(',') }
