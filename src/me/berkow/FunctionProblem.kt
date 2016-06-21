@@ -11,41 +11,43 @@ class FunctionProblem(val function: (List<Double>) -> Double, val lBound: Double
     val upperBounds = DoubleArray(problemSize, { uBound })
 
     object HOLDER {
-        @JvmStatic
-        val F1_PROBLEM = FunctionProblem(F1_FUNCTION, -100.0, 100.0, DoubleArray(30, { .0 }).asList())
+        val PROBLEM_SIZE = 30
 
         @JvmStatic
-        val F2_PROBLEM = FunctionProblem(F2_FUNCTION, -10.0, 10.0, DoubleArray(30, { .0 }).asList())
+        val F1_PROBLEM = FunctionProblem(F1_FUNCTION, -100.0, 100.0, DoubleArray(PROBLEM_SIZE, { .0 }).asList())
 
         @JvmStatic
-        val F3_PROBLEM = FunctionProblem(F3_FUNCTION, -100.0, 100.0, DoubleArray(30, { .0 }).asList())
+        val F2_PROBLEM = FunctionProblem(F2_FUNCTION, -10.0, 10.0, DoubleArray(PROBLEM_SIZE, { .0 }).asList())
 
         @JvmStatic
-        val F4_PROBLEM = FunctionProblem(F4_FUNCTION, -100.0, 100.0, DoubleArray(30, { .0 }).asList())
+        val F3_PROBLEM = FunctionProblem(F3_FUNCTION, -100.0, 100.0, DoubleArray(PROBLEM_SIZE, { .0 }).asList())
 
         @JvmStatic
-        val F5_PROBLEM = FunctionProblem(F5_FUNCTION, -30.0, 30.0, DoubleArray(30, { 1.0 }).asList())
+        val F4_PROBLEM = FunctionProblem(F4_FUNCTION, -100.0, 100.0, DoubleArray(PROBLEM_SIZE, { .0 }).asList())
 
         @JvmStatic
-        val F6_PROBLEM = FunctionProblem(F6_FUNCTION, -1.28, 1.28, DoubleArray(30, { .0 }).asList())
+        val F5_PROBLEM = FunctionProblem(F5_FUNCTION, -30.0, 30.0, DoubleArray(PROBLEM_SIZE, { 1.0 }).asList())
 
         @JvmStatic
-        val F7_PROBLEM = FunctionProblem(F7_FUNCTION, -500.0, 500.0, DoubleArray(30, { 420.96 }).asList())
+        val F6_PROBLEM = FunctionProblem(F6_FUNCTION, -1.28, 1.28, DoubleArray(PROBLEM_SIZE, { .0 }).asList())
 
         @JvmStatic
-        val F8_PROBLEM = FunctionProblem(F8_FUNCTION, -5.12, 5.12, DoubleArray(30, { .0 }).asList())
+        val F7_PROBLEM = FunctionProblem(F7_FUNCTION, -500.0, 500.0, DoubleArray(PROBLEM_SIZE, { 420.96 }).asList())
 
         @JvmStatic
-        val F9_PROBLEM = FunctionProblem(F9_FUNCTION, -32.0, 32.0, DoubleArray(30, { .0 }).asList())
+        val F8_PROBLEM = FunctionProblem(F8_FUNCTION, -5.12, 5.12, DoubleArray(PROBLEM_SIZE, { .0 }).asList())
 
         @JvmStatic
-        val F10_PROBLEM = FunctionProblem(F10_FUNCTION, -600.0, 600.0, DoubleArray(30, { .0 }).asList())
+        val F9_PROBLEM = FunctionProblem(F9_FUNCTION, -32.0, 32.0, DoubleArray(PROBLEM_SIZE, { .0 }).asList())
 
         @JvmStatic
-        val F11_PROBLEM = FunctionProblem(F11_FUNCTION, -50.0, 50.0, DoubleArray(30, { 1.0 }).asList())
+        val F10_PROBLEM = FunctionProblem(F10_FUNCTION, -600.0, 600.0, DoubleArray(PROBLEM_SIZE, { .0 }).asList())
 
         @JvmStatic
-        val F12_PROBLEM = FunctionProblem(F12_FUNCTION, -0.5, 0.5, DoubleArray(30, { .0 }).asList())
+        val F11_PROBLEM = FunctionProblem(F11_FUNCTION, -50.0, 50.0, DoubleArray(PROBLEM_SIZE, { 1.0 }).asList())
+
+        @JvmStatic
+        val F12_PROBLEM = FunctionProblem(F12_FUNCTION, -0.5, 0.5, DoubleArray(PROBLEM_SIZE, { .0 }).asList())
 
     }
 }

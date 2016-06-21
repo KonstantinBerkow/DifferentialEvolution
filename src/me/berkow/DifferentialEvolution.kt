@@ -78,6 +78,7 @@ fun differentialEvolution(parameters: Map<String, Any>, initialPopulation: Array
                           maxGenerationsCount: Int, precision: Double, function: MemoizeFunction<List<Double>, Double>,
                           random: Random, stagnationThreshold: Int = initialPopulation.size,
                           probablySolution: List<Double>?): Int {
+    println("parameters = [${parameters}], initialPopulation = [${initialPopulation}], newGenerationBlock = [${newGenerationBlock}], maxGenerationsCount = [${maxGenerationsCount}], precision = [${precision}], function = [${function}], random = [${random}], stagnationThreshold = [${stagnationThreshold}], probablySolution = [${probablySolution}]")
     var previousVectors = initialPopulation
 
     var previousAverageCost = previousVectors.map { function(it) }.average()
