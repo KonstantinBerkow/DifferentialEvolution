@@ -20,8 +20,8 @@ fun main(args: Array<String>) {
 fun differentialEvolution(parameters: Map<String, Any>, initialPopulation: Array<List<Double>>,
                           newGenerationBlock: (Map<String, Any>, Array<List<Double>>, Random, MemoizeFunction<List<Double>, Double>) -> Array<List<Double>>,
                           maxGenerationsCount: Int, precision: Double, function: MemoizeFunction<List<Double>, Double>,
-                          random: Random, stagnationThreshold: Int = initialPopulation.size,
-                          probablySolution: List<Double>?): Int {
+                          random: Random, stagnationThreshold: Int = initialPopulation.size * 4,
+                          probablySolution: List<Double>?): Triple<Double, Int, Int> {
     var previousVectors = initialPopulation
 
     var previousAverageCost = previousVectors.map { function(it) }.average()
@@ -66,7 +66,7 @@ fun differentialEvolution(parameters: Map<String, Any>, initialPopulation: Array
 
     println("average cost = ${previousAverageCost}")
 
-    return function.evaluationsCount
+    return Triple(previousAverageCost, function.evaluationsCount, stopGeneration)
 }
 
 fun de(parameters: Map<String, Any>, previousVectors: Array<List<Double>>,
