@@ -2,17 +2,10 @@ package me.berkow
 
 import java.util.*
 
-val RANDOM = "random"
-val PROBLEM_SIZE = "problem_size"
 val LOWER_CONSTRAINTS = "lower_constraints"
 val UPPER_CONSTRAINTS = "upper_constraints"
-val MAX_GEN = "max_gen"
-val POP_SIZE = "pop_size"
 val CROSSOVER_PROBABILITY = "cr"
 val AMPLIFICATION = "f"
-val FUNCTION = "function"
-val PRECISION = "eps"
-val INITIAL_SOLUTION = "initial_solution"
 val LOWER_AMPLIFICATION = "lower_amplification"
 val UPPER_AMPLIFICATION = "upper_amplification"
 val CROSSOVER_PROBABILITIES = "crossover_probabilities"
@@ -21,9 +14,10 @@ val T1 = "t1"
 val T2 = "t2"
 
 fun main(args: Array<String>) {
-    val random1 = Random(233313L)
-    val random2 = Random(233313L)
-    val random3 = Random(233313L)
+    val seed  = System.nanoTime()
+    val random1 = Random(seed)
+    val random2 = Random(seed)
+    val random3 = Random(seed)
 
     val problemSize = 10
     val lowerConstraints = DoubleArray(problemSize, { -100.0 })
@@ -32,11 +26,10 @@ fun main(args: Array<String>) {
 
     val populationSize = problemSize * 6
     val function = F1_FUNCTION
-    val precision = 1e-6
+    val precision = 1e-12
 
     val probableSolution = DoubleArray(problemSize, { 0.0 }).asList()
     val initialSolution = Array(populationSize, { createRandomVector(lowerConstraints, upperConstraints, Random()) })
-    val memorizedFunction = memorize(F1_FUNCTION)
     val amplification = 0.9
     val crossoverProbability = 0.5
 
@@ -46,19 +39,8 @@ fun main(args: Array<String>) {
             AMPLIFICATION to amplification,
             CROSSOVER_PROBABILITY to crossoverProbability
     )
-    differentialEvolution(deParameters, initialSolution, ::de, maxGenerations, precision, memorizedFunction, random1,
-            probablySolution = probableSolution)
-    val evaluationsForDE = memorizedFunction.evalutionsCount
-
-    val tdeParameters = mapOf(
-            LOWER_CONSTRAINTS to lowerConstraints,
-            UPPER_CONSTRAINTS to upperConstraints,
-            AMPLIFICATION to amplification,
-            CROSSOVER_PROBABILITY to crossoverProbability
-    )
-    differentialEvolution(tdeParameters, initialSolution, ::tde, maxGenerations, precision, memorize(function), random2,
-            probablySolution = probableSolution)
-    val evaluationsForTDE = memorizedFunction.evalutionsCount - evaluationsForDE + populationSize
+    val evaluationsForDE = differentialEvolution(deParameters, initialSolution, ::de, maxGenerations, precision,
+            memorize(function), random1, probablySolution = probableSolution)
 
     val lowerF = 0.1
     val upperF = 0.9
@@ -74,52 +56,73 @@ fun main(args: Array<String>) {
             LOWER_AMPLIFICATION to lowerF,
             UPPER_AMPLIFICATION to upperF
     )
-    differentialEvolution(sadeParameters, initialSolution, ::sade, maxGenerations, precision, memorize(function), random3,
-            probablySolution = probableSolution)
-    val evaluationsForSDE = memorizedFunction.evalutionsCount - evaluationsForDE - evaluationsForTDE + populationSize + populationSize
+    val evaluationsForSDE = differentialEvolution(sadeParameters, initialSolution, ::sade, maxGenerations, precision,
+            memorize(function), random3, probablySolution = probableSolution)
+
+    val tdeParameters = mapOf(
+            LOWER_CONSTRAINTS to lowerConstraints,
+            UPPER_CONSTRAINTS to upperConstraints,
+            AMPLIFICATION to amplification,
+            CROSSOVER_PROBABILITY to crossoverProbability
+    )
+    val evaluationsForTDE = differentialEvolution(tdeParameters, initialSolution, ::tde, maxGenerations, precision,
+            memorize(function), random2, probablySolution = probableSolution)
 
 
-    println("evaluationsForDE = $evaluationsForDE, evaluationsForTDE = $evaluationsForTDE, evaluationsForSDE = $evaluationsForSDE")
+    println("evaluationsForDE = $evaluationsForDE, evaluationsForSDE = $evaluationsForSDE, evaluationsForTDE = $evaluationsForTDE")
 }
 
 
 fun differentialEvolution(parameters: Map<String, Any>, initialPopulation: Array<List<Double>>,
                           newGenerationBlock: (Map<String, Any>, Array<List<Double>>, Random, MemorizeFunction<List<Double>, Double>) -> Array<List<Double>>,
                           maxGenerationsCount: Int, precision: Double, function: MemorizeFunction<List<Double>, Double>,
-                          random: Random, stagnationThreshold: Int = initialPopulation.size, probablySolution: List<Double>) {
+                          random: Random, stagnationThreshold: Int = initialPopulation.size,
+                          probablySolution: List<Double>?): Int {
     var previousVectors = initialPopulation
 
     var previousAverageCost = previousVectors.map { function(it) }.average()
     var stagnationCount = 0
     println("initial average = ${previousAverageCost}")
 
+    var stopTrigger = 0
+    var stopGeneration = maxGenerationsCount
     loop@ for (generation in 1..maxGenerationsCount) {
         val newVectors = newGenerationBlock(parameters, previousVectors, random, function)
 
-        val averageCost = newVectors.map { function(it) }.average()
-//        println("averageCost = ${averageCost}")
+        val currentAverageCost = newVectors.map { function(it) }.average()
+//        println("currentAverageCost = ${currentAverageCost}")
 
-        if (Math.abs(averageCost - previousAverageCost) < precision) {
+        if (Math.abs(currentAverageCost - previousAverageCost) < precision) {
             stagnationCount++
         } else {
             stagnationCount = 0
         }
 
-        previousAverageCost = averageCost
+        previousAverageCost = currentAverageCost
         previousVectors = newVectors
 
         if (stagnationCount >= stagnationThreshold) {
-            println("stop generation = ${generation}")
+            stopTrigger = 1
+            stopGeneration = generation
             break@loop
         }
 
-        if (Math.abs(function(probablySolution) - averageCost) < precision) {
-            println("stop generation = ${generation}")
+        if (probablySolution != null && Math.abs(function(probablySolution) - currentAverageCost) < precision) {
+            stopTrigger = 2
+            stopGeneration = generation
             break@loop
         }
     }
 
+    when (stopTrigger) {
+        0 -> println("Stopped due reaching max generations count!")
+        1 -> println("Stopped due stagnation at $stopGeneration!")
+        2 -> println("Stopped due to approximating probable solution at $stopGeneration!")
+    }
+
     println("average cost = ${previousAverageCost}")
+
+    return function.evalutionsCount
 }
 
 fun de(parameters: Map<String, Any>, previousVectors: Array<List<Double>>,
